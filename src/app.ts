@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import { dbConnect } from './utils/dbConnect';
+import { StudentRoutes } from './app/modules/student/student.route';
 
 
 const app: Application = express();
@@ -13,7 +14,8 @@ app.use(cors());
 // connections
 dbConnect();
 
-// application route
+// application routes
+app.use('/api/v1/students', StudentRoutes);
 
 
 const getController = (req: Request, res: Response) => {
