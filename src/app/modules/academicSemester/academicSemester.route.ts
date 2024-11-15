@@ -10,4 +10,4 @@ const router = express.Router();
 
 router.post('/create-academic-semester', validateRequest(AcademicSemesterValidations.createAcademicSemesterValidationSchema), AcademicSemesterControllers.createAcademicSemester);
 
-export const UserRoutes = router;
+export const AcademicSemesterRoutes = router;

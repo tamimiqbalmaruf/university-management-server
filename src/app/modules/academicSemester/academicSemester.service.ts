@@ -1,16 +1,11 @@
-import config from "../../config";
-import { TStudent } from "../student/student.interface";
-import { Student } from "../student/student.model";
+import { TAcademicSemester } from "./academicSemester.interface";
 import { AcademicSemester } from "./academicSemester.model";
 
 
 
-const createAcademicSemester = async (data) => {
-
-    const result = await AcademicSemester.create(data);
-
-    return result
-
+const createAcademicSemester = async (payload: TAcademicSemester) => {
+    const result = await AcademicSemester.create(payload);
+    return result;
 };
 
 
