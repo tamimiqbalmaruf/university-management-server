@@ -22,6 +22,6 @@ const createStudent = async (req: Request, res: Response) => {
   }
 };
 
-const UserControllers = {
+export const UserControllers = {
   createStudent
 }

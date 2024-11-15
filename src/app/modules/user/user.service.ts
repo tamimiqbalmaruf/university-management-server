@@ -1,31 +1,32 @@
 import config from "../../config";
 import { TStudent } from "../student/student.interface";
 import { Student } from "../student/student.model";
-import { TNewUser } from "./user.interface";
+import { TUser } from "./user.interface";
 import { User } from "./user.model";
 
 
 
 const createStudentIntoDB = async (password: string, studentData: TStudent) => {
-    const user :TNewUser  = {};
+    const userData: Partial<TUser> = {};
 
-    user.password = password || config.default_password as string
+    userData.password = password || config.default_password as string
 
-    user.role = "student";
+    userData.role = "student";
 
-    user.id = "2030100001"
+    userData.id = "2030100001"
 
-    const result = await User.create(user);
-
-
-if(Object.keys(result).length){
-studentData.id = result.id;
-studentData.user = result._id
-}
+    const newUser = await User.create(userData);
 
 
+    if (Object.keys(newUser).length) {
+        studentData.id = newUser.id;
+        studentData.user = newUser._id;
 
-    return result;
+        const newStudent = await Student.create(studentData)
+
+        return newStudent;
+    }
+
 };
 
 
