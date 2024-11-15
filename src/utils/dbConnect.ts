@@ -7,7 +7,7 @@ const dbConnect = async (): Promise<void> => {
       throw new Error('Database url is not defined');
     }
     await mongoose.connect(config.database_url as string);
-    console.log('Database is connected');
+    // console.log('Database is connected');
   } catch (error: unknown | [message?: string] | string | undefined) {
     console.log(`Error connecting to database, ${error}`);
   }
