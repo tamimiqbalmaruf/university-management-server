@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { UserServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
 
@@ -7,7 +7,7 @@ import {
 } from 'http-status-codes';
 
 
-const createStudent = async (req: Request, res: Response, next: NextFunction) => {
+const createStudent: RequestHandler = async (req, res, next) => {
   try {
     const { password, student: studentData } = req.body;
 
@@ -19,7 +19,7 @@ const createStudent = async (req: Request, res: Response, next: NextFunction) =>
       message: 'Student is created successfully',
       data: result
     });
-    
+
   } catch (err) {
     next(err)
   }
