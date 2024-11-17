@@ -25,7 +25,7 @@ const admissionSemester = await AcademicSemester.findById(payload.admissionSemes
 
 
 
-    userData.id = generateStudentId(admissionSemester as TAcademicSemester);
+    userData.id = await generateStudentId(admissionSemester as TAcademicSemester);
 
     const newUser = await User.create(userData);
 
