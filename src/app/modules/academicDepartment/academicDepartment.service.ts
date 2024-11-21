@@ -1,3 +1,4 @@
+import { AcademicFaculty } from "../academicFaculty/academicFaculty.model";
 import { TAcademicDepartment } from "./academicDepartment.interface";
 import { AcademicDepartment } from "./academicDepartment.model";
 
@@ -19,12 +20,18 @@ const createAcademicDepartment = async (payload: TAcademicDepartment) => {
 
 
 const getAllAcademicDepartments = async () => {
-    const result = await AcademicDepartment.find();
+    const result = await AcademicDepartment.find().populate({
+        path: "academicFaculty",
+        model: AcademicFaculty
+    });
     return result;
 };
 
 const getSingleAcademicDepartment = async (id: string) => {
-    const result = await AcademicDepartment.findById(id)
+    const result = await AcademicDepartment.findById(id).populate({
+        path: "academicFaculty",
+        model: AcademicFaculty
+    });
     return result;
 };
 
