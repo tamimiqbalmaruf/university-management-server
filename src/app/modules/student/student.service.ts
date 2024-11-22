@@ -26,7 +26,7 @@ const getAllStudentsFromDB = async () => {
 };
 
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await Student.findOne({id}).populate({
+  const result = await Student.findOne({ id }).populate({
     path: "academicSemester",
     model: AcademicSemester
   }).populate({
@@ -43,10 +43,38 @@ const getSingleStudentFromDB = async (id: string) => {
 
 const updateStudentFromDB = async (id: string, payload: Partial<TStudent>) => {
 
+  const { name, guardian, localGuardian, ...remainingStudentData } = payload;
 
-  
+  const modifiedUpdatedData: Record<string, unknown> = { ...remainingStudentData };
 
-  const result = await Student.findOneAndUpdate({id}, payload)
+
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdatedData[`name.${key}`] = value;
+    }
+  }
+
+  if (guardian && Object.keys(guardian).length) {
+    for (const [key, value] of Object.entries(guardian)) {
+      modifiedUpdatedData[`guardian.${key}`] = value;
+    }
+  }
+
+  if (localGuardian && Object.keys(localGuardian).length) {
+    for (const [key, value] of Object.entries(localGuardian)) {
+      modifiedUpdatedData[`localGuardian.${key}`] = value;
+    }
+  }
+
+
+
+  const result = await Student.findOneAndUpdate({ id }, modifiedUpdatedData, {
+    new: true,
+    runValidators: true
+  });
+
+
+  return result;
 
 };
 
@@ -57,7 +85,7 @@ const deleteStudentFromDB = async (id: string) => {
 
   const isUserExists = await Student.isUserExists(id);
 
-  if(!isUserExists){
+  if (!isUserExists) {
     throw new AppError(StatusCodes.BAD_REQUEST, "This user doesn't exist")
   }
 
@@ -97,6 +125,7 @@ const deleteStudentFromDB = async (id: string) => {
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
+    throw new Error("Failed to delete student")
   }
 
 };
