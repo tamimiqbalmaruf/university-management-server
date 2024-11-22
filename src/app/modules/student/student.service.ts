@@ -26,7 +26,7 @@ const getAllStudentsFromDB = async () => {
 };
 
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await Student.findById(id).populate({
+  const result = await Student.findOne({id}).populate({
     path: "academicSemester",
     model: AcademicSemester
   }).populate({
@@ -39,6 +39,18 @@ const getSingleStudentFromDB = async (id: string) => {
   });
   return result;
 };
+
+
+const updateStudentFromDB = async (id: string, payload: Partial<TStudent>) => {
+
+
+  
+
+  const result = await Student.findOneAndUpdate({id}, payload)
+
+};
+
+
 
 const deleteStudentFromDB = async (id: string) => {
 
@@ -87,12 +99,11 @@ const deleteStudentFromDB = async (id: string) => {
     await session.endSession();
   }
 
-
-
 };
 
 export const StudentServices = {
   getAllStudentsFromDB,
   getSingleStudentFromDB,
+  updateStudentFromDB,
   deleteStudentFromDB,
 };
