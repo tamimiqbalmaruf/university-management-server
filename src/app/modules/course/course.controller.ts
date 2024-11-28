@@ -30,12 +30,12 @@ const getSingleCourse = catchAsync(async (req, res) => {
 });
 
 const getAllCourses = catchAsync(async (req, res) => {
-    const result = await CourseServices.getAllCourses();
+    const result = await CourseServices.getAllCourses(req.query);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: 'Faculties are retrieved successfully',
+        message: 'Courses are retrieved successfully',
         data: result,
     });
 });
