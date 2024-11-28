@@ -20,7 +20,7 @@ const getAllCourses = async (query: Record<string, unknown>) => {
 }
 
 const getSingleCourse = async (id: string) => {
-    const result = await Course.findById(id);
+    const result = await Course.findById(id).populate('preRequisiteCourses.course');
     return result;
 }
 
