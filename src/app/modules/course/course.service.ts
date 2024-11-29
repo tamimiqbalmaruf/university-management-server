@@ -10,11 +10,11 @@ const createCourse = async () => {
 
 const getAllCourses = async (query: Record<string, unknown>) => {
     const courseQuery = new QueryBuilder(Course.find().populate('preRequisiteCourses.course'), query)
-    .search(courseSearchableFields)
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+        .search(courseSearchableFields)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
     const result = await courseQuery.modelQuery;
     return result;
 }
@@ -25,8 +25,21 @@ const getSingleCourse = async (id: string) => {
 }
 
 const updateCourse = async (id: string, payload: Partial<TCourse>) => {
-    const result = await Course.findByIdAndUpdate(id, payload);
-    return result;
+
+    const { preRequisiteCourses, ...courseRemainingData } = payload;
+
+
+    const updateBasicCourseInfo = await Course.findByIdAndUpdate(id, courseRemainingData, { new: true, runValidators: true });
+
+
+    if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+        const deletedPreRequisites = preRequisiteCourses.filter((item) => item.course && item.isDeleted).map(el => el.course);
+
+        const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(id, { $pull: { preRequisiteCourses: { course: { $in: deletedPreRequisites } } } })
+    }
+
+
+    return null;
 }
 
 const deleteCourse = async (id: string) => {
