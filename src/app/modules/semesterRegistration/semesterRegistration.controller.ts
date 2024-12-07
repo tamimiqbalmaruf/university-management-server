@@ -1,7 +1,4 @@
-
 import sendResponse from "../../utils/sendResponse";
-
-
 import {
   StatusCodes
 } from 'http-status-codes';
