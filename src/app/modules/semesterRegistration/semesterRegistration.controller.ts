@@ -20,9 +20,9 @@ const createSemesterRegistration = catchAsync(async (req, res) => {
 });
 
 
-const getAllSemesterRegistration = catchAsync(async (req, res) => {
+const getAllSemesterRegistrations = catchAsync(async (req, res) => {
 
-  const result = await SemesterRegistrationServices.getAllSemesterRegistration();
+  const result = await SemesterRegistrationServices.getAllSemesterRegistrations(req.query);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -35,9 +35,9 @@ const getAllSemesterRegistration = catchAsync(async (req, res) => {
 
 const getSingleSemesterRegistration = catchAsync(async (req, res) => {
 
-  const { semesterId } = req.params;
+  const { id } = req.params;
 
-  const result = await SemesterRegistrationServices.getSingleSemesterRegistration(semesterId);
+  const result = await SemesterRegistrationServices.getSingleSemesterRegistration(id);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -50,9 +50,9 @@ const getSingleSemesterRegistration = catchAsync(async (req, res) => {
 
 const updateSemesterRegistration = catchAsync(async (req, res) => {
 
-  const { semesterId } = req.params;
+  const { id } = req.params;
 
-  const result = await SemesterRegistrationServices.updateSemesterRegistration(semesterId, req.body);
+  const result = await SemesterRegistrationServices.updateSemesterRegistration(id, req.body);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -65,7 +65,7 @@ const updateSemesterRegistration = catchAsync(async (req, res) => {
 
 export const SemesterRegistrationControllers = {
   createSemesterRegistration,
-  getAllSemesterRegistration,
+  getAllSemesterRegistrations,
   getSingleSemesterRegistration,
   updateSemesterRegistration
 }
