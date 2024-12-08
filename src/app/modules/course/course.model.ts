@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema } from "mongoose";
 import { TCourse, TCourseFaculty, TPreRequisiteCourses } from "./course.interface";
 
 export const preRequisiteCoursesSchema = new Schema<TPreRequisiteCourses>({
