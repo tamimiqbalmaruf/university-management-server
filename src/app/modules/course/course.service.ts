@@ -6,8 +6,8 @@ import { Course, CourseFaculty } from "./course.model"
 import AppError from "../../errors/AppError";
 import { StatusCodes } from "http-status-codes";
 
-const createCourse = async () => {
-    const result = await Course.create();
+const createCourse = async (payload: TCourse) => {
+    const result = await Course.create(payload);
     return result;
 };
 
