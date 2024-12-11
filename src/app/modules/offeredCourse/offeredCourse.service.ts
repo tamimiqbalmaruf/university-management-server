@@ -57,10 +57,25 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
     }
 
 
+    const isDepartmentBelongToFaculty = await AcademicDepartment.findOne({
+        _id: academicDepartment,
+        academicFaculty,
+    });
 
 
+    if (!isDepartmentBelongToFaculty) {
+        throw new AppError(StatusCodes.BAD_REQUEST, `This ${isAcademicDepartmentExits.name} is not  belong to this ${isAcademicFacultyExits.name}`);
+    };
 
-    const result = await OfferedCourse.create({...payload, academicSemester});
+
+    const isSameOfferedCourseExistsWithSameRegisteredSemesterWithSameSection = await OfferedCourse.findOne({ semesterRegistration, course, section });
+
+    if (isSameOfferedCourseExistsWithSameRegisteredSemesterWithSameSection) {
+        throw new AppError(StatusCodes.BAD_REQUEST, `Offered course with same section is already exist!`)
+    }
+
+
+    const result = await OfferedCourse.create({ ...payload, academicSemester });
     return result;
 };
 
