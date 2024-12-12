@@ -8,6 +8,7 @@ import { AcademicDepartment } from "../academicDepartment/academicDepartment.mod
 import { Course } from "../course/course.model";
 import { Faculty } from "../faculty/faculty.model";
 import { hasTimeConflict } from "./offeredCourse.utils";
+import QueryBuilder from "../../builder/QueryBuilder";
 
 
 const createOfferedCourse = async (payload: TOfferedCourse) => {
@@ -99,13 +100,24 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
 };
 
 const getAllOfferedCourses = async (query: Record<string, unknown>) => {
-    const result = await OfferedCourse.find();
+    const offeredCourseQuery = new QueryBuilder(OfferedCourse.find(), query)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await offeredCourseQuery.modelQuery;
     return result;
 };
 
 const getSingleOfferedCourse = async (id: string) => {
-    const result = await OfferedCourse.findById(id)
-    return result;
+    const offeredCourse = await OfferedCourse.findById(id);
+
+    if (!offeredCourse) {
+        throw new AppError(404, 'Offered Course not found');
+    }
+
+    return offeredCourse;
 };
 
 const updateOfferedCourse = async (id: string, payload: Pick<TOfferedCourse, "faculty" | "days" | "startTime" | "endTime">) => {
@@ -163,6 +175,25 @@ const updateOfferedCourse = async (id: string, payload: Pick<TOfferedCourse, "fa
 };
 
 const deleteOfferedCourse = async (id: string) => {
+
+    const isOfferedCourseExists = await OfferedCourse.findById(id);
+
+    if (!isOfferedCourseExists) {
+        throw new AppError(StatusCodes.NOT_FOUND, 'Offered Course not found');
+    }
+
+    const semesterRegistration = isOfferedCourseExists.semesterRegistration;
+
+    const semesterRegistrationStatus =
+        await SemesterRegistration.findById(semesterRegistration).select('status');
+
+    if (semesterRegistrationStatus?.status !== 'UPCOMING') {
+        throw new AppError(
+            StatusCodes.BAD_REQUEST,
+            `Offered course can not update ! because the semester ${semesterRegistrationStatus}`,
+        );
+    }
+
     const result = await OfferedCourse.findByIdAndDelete(id)
     return result;
 };
