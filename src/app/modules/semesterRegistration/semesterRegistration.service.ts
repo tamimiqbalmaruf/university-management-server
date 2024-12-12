@@ -6,6 +6,8 @@ import { TSemesterRegistration } from "./semesterRegistration.interface";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { RegistrationStatus } from "./semesterRegistration.constant";
+import mongoose from "mongoose";
+import { OfferedCourse } from "../offeredCourse/offeredCourse.model";
 
 
 const createSemesterRegistration = async (payload: TSemesterRegistration) => {
@@ -83,9 +85,69 @@ const updateSemesterRegistration = async (id: string, payload: Partial<TSemester
 };
 
 
+const deleteSemesterRegistration = async (id: string) => {
+
+    const requestedSemester = await SemesterRegistration.findById(id);
+
+    if (!requestedSemester) {
+        throw new AppError(StatusCodes.NOT_FOUND, "This semester is not found!")
+    }
+
+    if (requestedSemester?.status !== RegistrationStatus.UPCOMING) {
+        throw new AppError(StatusCodes.BAD_REQUEST, `You can not delete this offered course as it is ${requestedSemester?.status}`)
+    };
+
+
+    const session = await mongoose.startSession();
+
+
+    try {
+        session.startTransaction();
+
+
+        const deletedOfferedCourse = await OfferedCourse.deleteMany({ semesterRegistration: id }, { session });
+
+        if (!deletedOfferedCourse) {
+            throw new AppError(
+                StatusCodes.BAD_REQUEST,
+                'Failed to delete offered courses!',
+            );
+        }
+
+
+        const deletedSemesterRegistration = await SemesterRegistration.findByIdAndDelete(id, { session, new: true });
+
+        if (!deletedSemesterRegistration) {
+            throw new AppError(
+                StatusCodes.BAD_REQUEST,
+                'Failed to delete semester registration!',
+            );
+        }
+
+
+        await session.commitTransaction();
+        await session.endSession();
+
+        return null;
+
+    } catch (error: any) {
+        await session.abortTransaction();
+        await session.endSession();
+        throw new Error(error);
+    }
+
+
+
+
+    const result = await SemesterRegistration.findByIdAndDelete(id);
+    return result;
+};
+
+
 export const SemesterRegistrationServices = {
     createSemesterRegistration,
     getAllSemesterRegistrations,
     getSingleSemesterRegistration,
-    updateSemesterRegistration
+    updateSemesterRegistration,
+    deleteSemesterRegistration
 }
