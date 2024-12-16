@@ -10,7 +10,7 @@ import { User } from "../user/user.model";
 
 const loginUser = async (payload: TLoginUser) => {
 
-    const isUserExists = await User.findOne({ id: payload?.id });
+    const isUserExists = await User.isUserExistsByCustomId(payload.id);
 
     if (!isUserExists) {
         throw new AppError(StatusCodes.NOT_FOUND, "The user is not found!")
@@ -24,9 +24,7 @@ const loginUser = async (payload: TLoginUser) => {
         throw new AppError(StatusCodes.FORBIDDEN, "The user is blocked!")
     };
 
-    const isPasswordMatch = await bcrypt.compare(payload?.password, isUserExists?.password);
-
-    if (!isPasswordMatch) {
+    if (!await User.isPasswordMatched(payload?.password, isUserExists?.password)) {
         throw new AppError(StatusCodes.FORBIDDEN, "User password is not matched!")
     };
     // return result;
