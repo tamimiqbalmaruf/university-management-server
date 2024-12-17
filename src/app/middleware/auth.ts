@@ -19,32 +19,34 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
         const decoded = jwt.verify(token, config.jwt_access_secret as string)
 
-        const {userId, role} = decoded as JwtPayload;
+        const { userId, role, iat } = decoded as JwtPayload;
 
         const user = await User.isUserExistsByCustomId(userId);
 
-    if (!user) {
-        throw new AppError(StatusCodes.NOT_FOUND, "The user is not found!")
-    };
+        if (!user) {
+            throw new AppError(StatusCodes.NOT_FOUND, "The user is not found!")
+        };
 
-    if (user?.isDeleted === true) {
-        throw new AppError(StatusCodes.FORBIDDEN, "The user is deleted!")
-    };
+        if (user?.isDeleted === true) {
+            throw new AppError(StatusCodes.FORBIDDEN, "The user is deleted!")
+        };
 
-    if (user?.status === "blocked") {
-        throw new AppError(StatusCodes.FORBIDDEN, "The user is blocked!")
-    };
+        if (user?.status === "blocked") {
+            throw new AppError(StatusCodes.FORBIDDEN, "The user is blocked!")
+        };
 
 
-            if( requiredRoles && !requiredRoles.includes(role)){
-                throw new AppError(StatusCodes.UNAUTHORIZED, "You're not authorized!")
-            }
+        if (user?.passwordChangedAt && User.isJWTIssuedBeforePasswordChanged(user?.passwordChangedAt, iat as number)) {
+            throw new AppError(StatusCodes.UNAUTHORIZED, "You're not authorized!")
+        }
 
-            req.user = decoded as JwtPayload;
-            next();
 
-      
+        if (requiredRoles && !requiredRoles.includes(role)) {
+            throw new AppError(StatusCodes.UNAUTHORIZED, "You're not authorized!")
+        }
 
+        req.user = decoded as JwtPayload;
+        next();
 
     })
 };
