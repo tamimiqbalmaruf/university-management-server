@@ -4,8 +4,8 @@ import { StatusCodes } from "http-status-codes";
 
 import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
-import { TLoginUser } from "./auth.interface";
-import jwt from "jsonwebtoken";
+import { TChangePassword, TLoginUser } from "./auth.interface";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 
 
@@ -42,6 +42,23 @@ const loginUser = async (payload: TLoginUser) => {
     };
 };
 
+
+const changePassword = async (userData: JwtPayload, payload: TChangePassword) => {
+
+    await User.findOneAndUpdate(
+        {
+          id: userData.userId,
+          role: userData.role,
+        },
+        // {
+        //   password: newHashedPassword,
+        //   needsPasswordChange: false,
+        //   passwordChangedAt: new Date(),
+        // },
+      );
+};
+
 export const AuthServices = {
-    loginUser
+    loginUser,
+    changePassword
 }
