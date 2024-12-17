@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { TUserRole } from "../modules/user/user.interface";
+import { User } from "../modules/user/user.model";
 
 const auth = (...requiredRoles: TUserRole[]) => {
 
@@ -16,12 +17,24 @@ const auth = (...requiredRoles: TUserRole[]) => {
             throw new AppError(StatusCodes.UNAUTHORIZED, "You're not authorized!")
         };
 
-        jwt.verify(token, config.jwt_access_secret as string, function (err, decoded) {
-            if (err) {
-                throw new AppError(StatusCodes.UNAUTHORIZED, "You're not authorized!")
-            }
+        const decoded = jwt.verify(token, config.jwt_access_secret as string)
 
-            const {role} = decoded as JwtPayload;
+        const {userId, role} = decoded as JwtPayload;
+
+        const user = await User.isUserExistsByCustomId(userId);
+
+    if (!user) {
+        throw new AppError(StatusCodes.NOT_FOUND, "The user is not found!")
+    };
+
+    if (user?.isDeleted === true) {
+        throw new AppError(StatusCodes.FORBIDDEN, "The user is deleted!")
+    };
+
+    if (user?.status === "blocked") {
+        throw new AppError(StatusCodes.FORBIDDEN, "The user is blocked!")
+    };
+
 
             if( requiredRoles && !requiredRoles.includes(role)){
                 throw new AppError(StatusCodes.UNAUTHORIZED, "You're not authorized!")
@@ -29,7 +42,8 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
             req.user = decoded as JwtPayload;
             next();
-        })
+
+      
 
 
     })
