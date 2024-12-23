@@ -168,9 +168,31 @@ const forgetPassword = async (id: string) => {
 
 };
 
+const resetPassword = async (payload: { id: string; newPassword: string }, token: string) => {
+
+    const user = await User.isUserExistsByCustomId(payload?.id);
+
+    if (!user) {
+        throw new AppError(StatusCodes.NOT_FOUND, "The user is not found!")
+    };
+
+    if (user?.isDeleted === true) {
+        throw new AppError(StatusCodes.FORBIDDEN, "The user is deleted!")
+    };
+
+    if (user?.status === "blocked") {
+        throw new AppError(StatusCodes.FORBIDDEN, "The user is blocked!")
+    };
+
+
+  
+
+};
+
 export const AuthServices = {
     loginUser,
     changePassword,
     refreshToken,
-    forgetPassword
+    forgetPassword,
+    resetPassword
 }

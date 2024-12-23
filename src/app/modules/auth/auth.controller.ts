@@ -15,7 +15,7 @@ const loginUser = catchAsync(async (req, res) => {
 
     const result = await AuthServices.loginUser(req.body);
 
-    const {accessToken, refreshToken, needsPasswordChange} = result;
+    const { accessToken, refreshToken, needsPasswordChange } = result;
 
     res.cookie('refreshToken', refreshToken, {
         secure: config.NODE_ENV === "production",
@@ -36,7 +36,7 @@ const loginUser = catchAsync(async (req, res) => {
 
 
 const changePassword = catchAsync(async (req, res) => {
-    const {...passwordData} = req.body;
+    const { ...passwordData } = req.body;
     const result = await AuthServices.changePassword(req.user, passwordData);
 
     sendResponse(res, {
@@ -50,7 +50,7 @@ const changePassword = catchAsync(async (req, res) => {
 
 
 const refreshToken = catchAsync(async (req, res) => {
-   const {refreshToken} = req.cookies;
+    const { refreshToken } = req.cookies;
     const result = await AuthServices.refreshToken(refreshToken);
 
     sendResponse(res, {
@@ -77,9 +77,24 @@ const forgetPassword = catchAsync(async (req, res) => {
 });
 
 
+const resetPassword = catchAsync(async (req, res) => {
+    const token = req.headers.authorization;
+    const result = await AuthServices.resetPassword(req.body, token as string);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Password reset successfully!',
+        data: result
+    });
+
+});
+
+
 export const AuthControllers = {
     loginUser,
     changePassword,
     refreshToken,
-    forgetPassword
+    forgetPassword,
+    resetPassword
 }
