@@ -185,7 +185,31 @@ const resetPassword = async (payload: { id: string; newPassword: string }, token
     };
 
 
-  
+    const decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload
+
+    if (payload.id !== decoded.userId) {
+        throw new AppError(StatusCodes.FORBIDDEN, "You are forbidden!")
+    }
+
+    const newHashedPassword = await bcrypt.hash(
+        payload.newPassword,
+        Number(config.bcrypt_salt_rounds),
+    );
+
+
+    await User.findOneAndUpdate(
+        {
+            id: decoded.userId,
+            role: decoded.role,
+        },
+        {
+            password: newHashedPassword,
+            needsPasswordChange: false,
+            passwordChangedAt: new Date(),
+        },
+    );
+
+    return null
 
 };
 
