@@ -71,7 +71,7 @@ const createStudentIntoDB = async (file: any, password: string, payload: TStuden
 };
 
 
-const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+const createFacultyIntoDB = async (file: any, password: string, payload: TFaculty) => {
   const userData: Partial<TUser> = {};
 
   userData.password = password || (config.default_password as string);
@@ -94,6 +94,11 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
     userData.id = await generateFacultyId();
 
+    const imageName = `${userData?.id}${payload.name.firstName}`;
+    const path = file?.path;
+
+    const {secure_url} = await sendImageToCloudinary(imageName, path) as any;
+
     const newUser = await User.create([userData], { session }); // array
 
     if (!newUser.length) {
@@ -102,6 +107,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
+    payload.profileImg = secure_url;
 
     const newFaculty = await Faculty.create([payload], { session });
 
@@ -121,7 +127,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 };
 
 
-const createAdminIntoDB = async (password: string, payload: TFaculty) => {
+const createAdminIntoDB = async (file: any, password: string, payload: TFaculty) => {
   const userData: Partial<TUser> = {};
 
   userData.password = password || (config.default_password as string);
@@ -136,6 +142,11 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
 
     userData.id = await generateAdminId();
 
+    const imageName = `${userData?.id}${payload.name.firstName}`;
+    const path = file?.path;
+
+    const {secure_url} = await sendImageToCloudinary(imageName, path) as any;
+
     const newUser = await User.create([userData], { session }); // array
 
     if (!newUser.length) {
@@ -144,6 +155,7 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
 
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
+    payload.profileImg = secure_url;
 
     const newAdmin = await Admin.create([payload], { session });
 
