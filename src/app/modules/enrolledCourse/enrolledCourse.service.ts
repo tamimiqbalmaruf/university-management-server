@@ -6,6 +6,7 @@ import AppError from '../../errors/AppError';
 import EnrolledCourse from './enrolledCourse.model';
 import { Student } from '../student/student.model';
 import mongoose from 'mongoose';
+import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -39,6 +40,19 @@ const createEnrolledCourseIntoDB = async (
   if (isStudentAlreadyEnrolled) {
     throw new AppError(StatusCodes.CONFLICT, 'Student is already enrolled !');
   };
+
+const semesterRegistration = await SemesterRegistration.findById(isOfferedCourseExists?.semesterRegistration).select('maxCredit');
+
+const enrolledCourses = await EnrolledCourse.aggregate([
+  {$match: {
+    semesterRegistration: isOfferedCourseExists?.semesterRegistration,
+    student: student?._id
+  }}
+])
+
+
+
+
 
 
   const session = await mongoose.startSession();
