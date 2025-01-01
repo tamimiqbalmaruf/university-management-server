@@ -18,8 +18,11 @@ const getAllCourses = async (query: Record<string, unknown>) => {
         .sort()
         .paginate()
         .fields();
+
+    const meta = await courseQuery.countTotal();
     const result = await courseQuery.modelQuery;
-    return result;
+    
+    return { meta, result };
 }
 
 const getSingleCourse = async (id: string) => {
@@ -118,7 +121,7 @@ const assignFacultiesWithCourse = async (id: string, payload: Partial<TCourseFac
 
 const removeFacultiesFromCourse = async (id: string, payload: Partial<TCourseFaculty>) => {
     const result = await CourseFaculty.findByIdAndUpdate(id,
-        { $pull: {faculties: {$in: payload}}},
+        { $pull: { faculties: { $in: payload } } },
         { new: true });
     return result;
 }
