@@ -84,17 +84,17 @@ const createEnrolledCourseIntoDB = async (
   ]);
 
 
- //  total enrolled credits + new enrolled course credit > maxCredit
- const totalCredits =
- enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCredits : 0;
+  //  total enrolled credits + new enrolled course credit > maxCredit
+  const totalCredits =
+    enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCredits : 0;
 
 
- if (totalCredits && maxCredit && totalCredits + currentCredit > maxCredit) {
-  throw new AppError(
-    StatusCodes.BAD_REQUEST,
-    'You have exceeded maximum number of credits !',
-  );
-}
+  if (totalCredits && maxCredit && totalCredits + currentCredit > maxCredit) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      'You have exceeded maximum number of credits !',
+    );
+  }
 
 
 
@@ -149,46 +149,56 @@ const updateEnrolledCourseMarks = async (
   const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
 
   const isSemesterRegistrationExists =
-  await SemesterRegistration.findById(semesterRegistration);
+    await SemesterRegistration.findById(semesterRegistration);
 
-if (!isSemesterRegistrationExists) {
-  throw new AppError(
-    StatusCodes.NOT_FOUND,
-    'Semester registration not found !',
-  );
-}
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      'Semester registration not found !',
+    );
+  }
 
-const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
+  const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
 
-if (!isOfferedCourseExists) {
-  throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not found !');
-}
-const isStudentExists = await Student.findById(student);
+  if (!isOfferedCourseExists) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Offered course not found !');
+  }
+  const isStudentExists = await Student.findById(student);
 
-if (!isStudentExists) {
-  throw new AppError(StatusCodes.NOT_FOUND, 'Student not found !');
-}
+  if (!isStudentExists) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Student not found !');
+  }
 
-const faculty = await Faculty.findOne({ id: facultyId }, { _id: 1 });
+  const faculty = await Faculty.findOne({ id: facultyId }, { _id: 1 });
 
-if (!faculty) {
-  throw new AppError(StatusCodes.NOT_FOUND, 'Faculty not found !');
-}
+  if (!faculty) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Faculty not found !');
+  }
 
-const isCourseBelongToFaculty = await EnrolledCourse.findOne({
-  semesterRegistration,
-  offeredCourse,
-  student,
-  faculty: faculty._id,
-});
+  const isCourseBelongToFaculty = await EnrolledCourse.findOne({
+    semesterRegistration,
+    offeredCourse,
+    student,
+    faculty: faculty._id,
+  });
 
-if (!isCourseBelongToFaculty) {
-  throw new AppError(StatusCodes.FORBIDDEN, 'You are forbidden! !');
-};
-
-
+  if (!isCourseBelongToFaculty) {
+    throw new AppError(StatusCodes.FORBIDDEN, 'You are forbidden! !');
+  };
 
 
+  const modifiedData: Record<string, unknown> = { ...courseMarks };
+
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedData[`courseMarks.${key}`] = value;
+    }
+  };
+
+
+  const result = await EnrolledCourse.findByIdAndUpdate(isCourseBelongToFaculty._id, modifiedData, { new: true })
+
+  return result;
 
 };
 
