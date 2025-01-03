@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import config from '../app/config';
+import seedSuperAdmin from '../app/DB';
 
 const dbConnect = async (): Promise<void> => {
   try {
@@ -8,6 +9,7 @@ const dbConnect = async (): Promise<void> => {
     }
     await mongoose.connect(config.database_url as string);
     // console.log('Database is connected');
+    await seedSuperAdmin();
   } catch (error: unknown | [message?: string] | string | undefined) {
     console.log(`Error connecting to database, ${error}`);
   }
