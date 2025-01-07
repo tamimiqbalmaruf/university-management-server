@@ -1,8 +1,8 @@
 import { StatusCodes } from "http-status-codes";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import config from "../../config";
 import AppError from "../../errors/AppError";
+import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 import { TAcademicSemester } from "../academicSemester/academicSemester.interface";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
@@ -14,7 +14,6 @@ import { Student } from "../student/student.model";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
 import { generateAdminId, generateFacultyId, generateStudentId } from "./user.utils";
-import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 
 
 const createStudentIntoDB = async (file: any, password: string, payload: TStudent) => {
@@ -103,6 +102,8 @@ const createFacultyIntoDB = async (file: any, password: string, payload: TFacult
   if (!academicDepartment) {
     throw new AppError(400, 'Academic department not found');
   }
+
+  payload.academicFaculty = academicDepartment.academicFaculty;
 
   const session = await mongoose.startSession();
 
