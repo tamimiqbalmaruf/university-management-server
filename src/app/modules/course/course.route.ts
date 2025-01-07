@@ -7,18 +7,18 @@ import { USER_ROLE } from '../user/user.constant';
 
 const router = express.Router();
 
-router.post('/create-course', auth(USER_ROLE.admin), validateRequest(CourseValidations.createCourseValidationSchema), CourseControllers.createCourse);
+router.post('/create-course', auth(USER_ROLE.superAdmin, USER_ROLE.admin), validateRequest(CourseValidations.createCourseValidationSchema), CourseControllers.createCourse);
 
-router.get('/:id', auth('admin', 'faculty', 'student'), CourseControllers.getSingleCourse);
+router.get('/:id', auth('superAdmin', 'admin', 'faculty', 'student'), CourseControllers.getSingleCourse);
 
-router.delete('/:id', auth(USER_ROLE.admin), CourseControllers.deleteCourse);
+router.delete('/:id', auth(USER_ROLE.superAdmin, USER_ROLE.admin), CourseControllers.deleteCourse);
 
-router.patch('/:id', auth(USER_ROLE.admin), validateRequest(CourseValidations.updateCourseValidationSchema), CourseControllers.updateCourse);
+router.patch('/:id', auth(USER_ROLE.superAdmin, USER_ROLE.admin), validateRequest(CourseValidations.updateCourseValidationSchema), CourseControllers.updateCourse);
 
-router.put("/:courseId/assign-faculties", auth(USER_ROLE.admin), validateRequest(CourseValidations.facultiesWithCourseValidationSchema), CourseControllers.assignFacultiesWithCourse)
+router.put("/:courseId/assign-faculties", auth(USER_ROLE.superAdmin, USER_ROLE.admin), validateRequest(CourseValidations.facultiesWithCourseValidationSchema), CourseControllers.assignFacultiesWithCourse)
 
-router.delete("/:courseId/remove-faculties", auth(USER_ROLE.admin), validateRequest(CourseValidations.facultiesWithCourseValidationSchema), CourseControllers.assignFacultiesWithCourse)
+router.delete("/:courseId/remove-faculties", auth(USER_ROLE.superAdmin, USER_ROLE.admin), validateRequest(CourseValidations.facultiesWithCourseValidationSchema), CourseControllers.assignFacultiesWithCourse)
 
-router.get('/', auth('admin', 'faculty', 'student'), CourseControllers.getAllCourses);
+router.get('/', auth('superAdmin','admin', 'faculty', 'student'), CourseControllers.getAllCourses);
 
 export const CourseRoutes = router;
