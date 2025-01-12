@@ -17,7 +17,9 @@ router.patch('/:id', auth(USER_ROLE.superAdmin, USER_ROLE.admin), validateReques
 
 router.put("/:courseId/assign-faculties", auth(USER_ROLE.superAdmin, USER_ROLE.admin), validateRequest(CourseValidations.facultiesWithCourseValidationSchema), CourseControllers.assignFacultiesWithCourse)
 
-router.delete("/:courseId/remove-faculties", auth(USER_ROLE.superAdmin, USER_ROLE.admin), validateRequest(CourseValidations.facultiesWithCourseValidationSchema), CourseControllers.assignFacultiesWithCourse)
+router.get("/:courseId/get-faculties", auth('superAdmin', 'admin', 'faculty', 'student'), CourseControllers.getFacultiesWithCourse)
+
+router.delete("/:courseId/remove-faculties", auth(USER_ROLE.superAdmin, USER_ROLE.admin), validateRequest(CourseValidations.facultiesWithCourseValidationSchema), CourseControllers.removeFacultiesFromCourse)
 
 router.get('/', auth('superAdmin','admin', 'faculty', 'student'), CourseControllers.getAllCourses);
 
