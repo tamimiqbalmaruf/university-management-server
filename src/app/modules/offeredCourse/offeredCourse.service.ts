@@ -124,9 +124,30 @@ const getMyOfferedCourses = async (userId: string) => {
     }
 
 
-    const currentOngoingSemester = await SemesterRegistration.findOne({ status: 'ONGOING' });
+    const currentOngoingRegistrationSemester = await SemesterRegistration.findOne({ status: 'ONGOING' });
 
+    if (!currentOngoingRegistrationSemester) {
+        throw new AppError(StatusCodes.NOT_FOUND, 'There is no ongoing Semester Registration!')
+    }
 
+const result = await OfferedCourse.aggregate([
+    {
+        $match: {
+            semesterRegistration: currentOngoingRegistrationSemester?._id,
+            academicFaculty: student.academicFaculty,
+            academicDepartment: student.academicDepartment,
+
+        }
+    },
+    {
+        $lookup: {
+            from: 'courses',
+            localField: 'course',
+            foreignField: '_id',
+            as: 'course'
+        }
+    }
+])
 
     return null
 };
