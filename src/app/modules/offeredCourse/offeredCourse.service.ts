@@ -9,6 +9,7 @@ import { Course } from "../course/course.model";
 import { Faculty } from "../faculty/faculty.model";
 import { hasTimeConflict } from "./offeredCourse.utils";
 import QueryBuilder from "../../builder/QueryBuilder";
+import { Student } from "../student/student.model";
 
 
 const createOfferedCourse = async (payload: TOfferedCourse) => {
@@ -106,8 +107,28 @@ const getAllOfferedCourses = async (query: Record<string, unknown>) => {
         .paginate()
         .fields();
 
+    const meta = await offeredCourseQuery.countTotal();
     const result = await offeredCourseQuery.modelQuery;
-    return result;
+    return {
+        meta,
+        result
+    };
+};
+
+const getMyOfferedCourses = async (userId: string) => {
+
+    const student = await Student.findOne({ id: userId });
+
+    if (!student) {
+        throw new AppError(StatusCodes.NOT_FOUND, 'User is not found')
+    }
+
+
+    const currentOngoingSemester = await SemesterRegistration.findOne({ status: 'ONGOING' });
+
+
+
+    return null
 };
 
 const getSingleOfferedCourse = async (id: string) => {
@@ -202,6 +223,7 @@ const deleteOfferedCourse = async (id: string) => {
 export const OfferedCourseServices = {
     createOfferedCourse,
     getAllOfferedCourses,
+    getMyOfferedCourses,
     getSingleOfferedCourse,
     updateOfferedCourse,
     deleteOfferedCourse
