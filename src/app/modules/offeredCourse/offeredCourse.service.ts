@@ -119,7 +119,11 @@ const getMyOfferedCourses = async (
     userId: string,
     query: Record<string, unknown>,
 ) => {
-  
+    //pagination setup
+
+    const page = Number(query?.page) || 1;
+    const limit = Number(query?.limit) || 10;
+    const skip = (page - 1) * limit;
 
     const student = await Student.findOne({ id: userId });
     // find the student
@@ -265,7 +269,33 @@ const getMyOfferedCourses = async (
         },
     ];
 
+    const paginationQuery = [
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+    ];
 
+    const result = await OfferedCourse.aggregate([
+        ...aggregationQuery,
+        ...paginationQuery,
+    ]);
+
+    const total = (await OfferedCourse.aggregate(aggregationQuery)).length;
+
+    const totalPage = Math.ceil(result.length / limit);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
+        result,
+    };
 };
 
 
