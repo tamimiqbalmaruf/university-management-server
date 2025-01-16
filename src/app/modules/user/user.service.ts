@@ -51,7 +51,7 @@ const createStudentIntoDB = async (file: any, password: string, payload: TStuden
       const imageName = `${userData?.id}${payload.name.firstName}`;
       const path = file?.path;
 
-      const { secure_url } = await sendImageToCloudinary(imageName, path) as any;
+      const { secure_url } = await sendImageToCloudinary(imageName, path);
 
       payload.profileImg = secure_url as string;
     }
@@ -116,7 +116,7 @@ const createFacultyIntoDB = async (file: any, password: string, payload: TFacult
       const imageName = `${userData?.id}${payload.name.firstName}`;
       const path = file?.path;
 
-      const { secure_url } = await sendImageToCloudinary(imageName, path) as any;
+      const { secure_url } = await sendImageToCloudinary(imageName, path);
 
       payload.profileImg = secure_url as string;
     }
@@ -168,7 +168,7 @@ const createAdminIntoDB = async (file: any, password: string, payload: TFaculty)
       const imageName = `${userData?.id}${payload.name.firstName}`;
       const path = file?.path;
 
-      const { secure_url } = await sendImageToCloudinary(imageName, path) as any;
+      const { secure_url } = await sendImageToCloudinary(imageName, path);
 
       payload.profileImg = secure_url as string;
     }

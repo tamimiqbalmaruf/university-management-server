@@ -10,7 +10,7 @@ import { StatusCodes } from 'http-status-codes';
 
 const getAllFaculties = async (query: Record<string, unknown>) => {
     const facultyQuery = new QueryBuilder(
-        Faculty.find().populate('academicDepartment'),
+        Faculty.find().populate('academicDepartment academicFaculty'),
         query,
     )
         .search(FacultySearchableFields)
@@ -20,7 +20,11 @@ const getAllFaculties = async (query: Record<string, unknown>) => {
         .fields();
 
     const result = await facultyQuery.modelQuery;
-    return result;
+    const meta = await facultyQuery.countTotal();
+    return {
+        result,
+        meta,
+    };
 };
 
 const getSingleFaculty = async (id: string) => {

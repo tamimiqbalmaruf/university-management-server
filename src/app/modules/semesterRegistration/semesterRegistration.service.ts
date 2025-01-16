@@ -37,19 +37,25 @@ const createSemesterRegistration = async (payload: TSemesterRegistration) => {
 };
 
 
-const getAllSemesterRegistrations = async (query: Record<string, unknown>) => {
-
-    const semesterRegistrationQuery = new QueryBuilder(SemesterRegistration.find().populate("academicSemester"), query)
-        // .search([""])
-        .filter()
-        .sort()
-        .paginate()
-        .fields();
-
-
+const getAllSemesterRegistrations = async (
+    query: Record<string, unknown>,
+  ) => {
+    const semesterRegistrationQuery = new QueryBuilder(
+      SemesterRegistration.find().populate('academicSemester'),
+      query,
+    )
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+  
     const result = await semesterRegistrationQuery.modelQuery;
-    return result;
-};
+    const meta = await semesterRegistrationQuery.countTotal();
+    return {
+      result,
+      meta,
+    };
+  };
 
 
 const getSingleSemesterRegistration = async (id: string) => {
